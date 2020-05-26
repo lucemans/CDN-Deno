@@ -37,13 +37,13 @@ listenAndServe({port: 8000}, async (req: ServerRequest) => {
             req.respond({body: "found " + filename});
             return;
         }
+        if (req.url.match(/\/healthz/g)) {
+            req.respond({status: 200, body: new TextEncoder().encode("200 OK")});
+            return;
+        }
         req.respond({status: 404});
     } catch (error) {
         console.log(error);
         req.respond({status: 500})
-    }
-    if (req.url.match(/\/healthz/g)) {
-        req.respond({status: 200, body: new TextEncoder().encode("200 OK")});
-        return;
     }
 });

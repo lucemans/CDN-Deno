@@ -1,13 +1,14 @@
 import { listenAndServe, ServerRequest } from 'https://deno.land/std/http/server.ts';
 import { existsSync, walkSync, ensureDir, ensureDirSync } from "https://deno.land/std/fs/mod.ts";
 
-const defaultDir = "/data";
+const defaultDir = "."; //"/data";
 ensureDirSync(defaultDir);
 
 listenAndServe({port: 8000}, async (req: ServerRequest) => {
     try {
-        let filename = '.' + (req.url.startsWith('/') ? '' : '/') + req.url; 
-        const raw = req.headers.has('connection') ? (filename.startsWith('./raw/')) : true;
+        let filename = defaultDir + (req.url.startsWith('/') ? '' : '/') + req.url; 
+        const raw = req.headers.has('cache-control') ? (filename.startsWith('./raw/')) : true;
+        
         if (filename.startsWith('./raw/')) {
             filename = filename.substr('./raw/'.length);
         }

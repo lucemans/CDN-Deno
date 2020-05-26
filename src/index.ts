@@ -19,7 +19,9 @@ listenAndServe({port: 8000}, async (req: ServerRequest) => {
         if (existsSync(filename)) {
             const info = await Deno.stat(filename);
             if (info.isFile) {
-                req.respond({body: (
+                const h = new Headers();
+                h.set("Cache-Control", "max-age=300");
+                req.respond({headers: h, body: (
                     raw ? 
                     Deno.readFileSync(filename) :
                     Deno.readTextFileSync('./src/index.html').replace(/\{\{contentRaw\}\}/g, filename.replace(defaultDir + '/', '/raw/'))

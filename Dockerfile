@@ -1,3 +1,4 @@
 FROM registry.lucemans.com/deno:latest
-COPY src ./
-CMD ["/bin/deno", "run", "--allow-net", "--allow-env", "--allow-read", "--unstable", "src/index.ts"]
+COPY run.sh .
+COPY src src
+CMD ["sh", "./run.sh"]

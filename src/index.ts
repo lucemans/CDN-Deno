@@ -10,12 +10,13 @@ listenAndServe({port: 8000}, async (req: ServerRequest) => {
         return;
     }
     try {
-        let filename = defaultDir + (req.url.startsWith('/') ? '' : '/') + req.url; 
-        const raw = req.headers.has('cache-control') ? (filename.startsWith('./raw/')) : true;
+        let filename = (req.url.startsWith('/') ? '' : '/') + req.url; 
+        const raw = req.headers.has('cache-control') ? (filename.startsWith('/raw/')) : true;
         
-        if (filename.startsWith('./raw/')) {
-            filename = filename.substr('./raw/'.length);
+        if (filename.startsWith('/raw/')) {
+            filename = filename.substr(('/raw').length);
         }
+        filename = defaultDir + filename;
 
         if (existsSync(filename)) {
             const info = await Deno.stat(filename);
@@ -31,7 +32,7 @@ listenAndServe({port: 8000}, async (req: ServerRequest) => {
                     req.respond({body: (
                         raw ? 
                         Deno.readFileSync(filename) :
-                        Deno.readTextFileSync('./src/index.html').replace(/\{\{contentRaw\}\}/g, filename.replace(/^\.\//g, '/raw/'))
+                        Deno.readTextFileSync('./src/index.html').replace(/\{\{contentRaw\}\}/g, filename.replace(defaultDir + '/', '/raw/'))
                     )});
                 return;
             }

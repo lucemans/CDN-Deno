@@ -1,5 +1,5 @@
-import { listenAndServe, ServerRequest } from 'https://deno.land/std/http/server.ts';
-import { existsSync, walkSync, ensureDir, ensureDirSync } from "https://deno.land/std/fs/mod.ts";
+import {listenAndServe, ServerRequest} from 'https://deno.land/std/http/server.ts';
+import {existsSync, walkSync, ensureDir, ensureDirSync} from "https://deno.land/std/fs/mod.ts";
 
 const defaultDir = "/data";
 ensureDirSync(defaultDir);
@@ -21,17 +21,24 @@ listenAndServe({port: 8000}, async (req: ServerRequest) => {
             if (info.isFile) {
                 const h = new Headers();
                 h.set("Cache-Control", "max-age=300");
-                req.respond({headers: h, body: (
-                    raw ? 
-                    Deno.readFileSync(filename) :
-                    Deno.readTextFileSync('./src/index.html').replace(/\{\{contentRaw\}\}/g, filename.replace(defaultDir + '/', '/raw/'))
-                )});
+                if (raw) {
+                    if (filename.endsWith(".svg")) {
+                        h.set('Content-Type', 'image/svg+xml');
+                    }
+                }
+                req.respond({
+                    headers: h, body: (
+                        raw ?
+                            Deno.readFileSync(filename) :
+                            Deno.readTextFileSync('./src/index.html').replace(/\{\{contentRaw\}\}/g, filename.replace(defaultDir + '/', '/raw/'))
+                    )
+                });
                 return;
             }
             if (info.isDirectory) {
                 const files = [];
                 for (const entry of Deno.readDirSync(filename)) {
-                        files.push(entry.name);
+                    files.push(entry.name);
                 }
                 req.respond({body: "Files in this dir: \n" + files.join('\n')});
                 return;
